@@ -53,8 +53,9 @@ methods:{
       const { data: res} = await this.$http.post('login',this.loginForm)
       if(res.meta.status !== 200) return this.$message.error('登录失败')
  this.$message.success('登录成功')
+      //将登录成功的token保存到客户端的sessionStorage中
       window.sessionStorage.setItem('token',res.data.token)
-      this.$router.push('./home')
+      this.$router.push('/home')
 
       })
   }
