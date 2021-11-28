@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router/router'
 import './plugins/element.js'
+import './assets/fonts/iconfont.css'
 import './assets/css/global.css'
 Vue.config.productionTip = false
 import axios from 'axios'

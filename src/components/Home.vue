@@ -16,12 +16,12 @@
           <el-menu
               background-color="#333744"
               text-color="#fff"
-              active-text-color="#409eff">
+              active-text-color="#409eff" :unique-opened="true">
             <!--              一级菜单-->
             <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
               <!--                一级菜单模板-->
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i :class="iconsObj[item.id]"></i>
                 <span>{{item.authName}}</span>
               </template>
 <!--              二级菜单-->
@@ -50,7 +50,16 @@ export default{
   data(){
     return{
       //左侧菜单数据
-      menulist: []
+      menulist: [],
+      iconsObj: {
+        '125':'iconfont icon-user',
+        '103':'iconfont icon-tijikongjian',
+        '101':'iconfont icon-shangpin',
+        '102':'iconfont icon-danju',
+        '145':'iconfont icon-baobiao'
+
+
+      }
     }
   },
   created() {
@@ -64,6 +73,7 @@ export default{
     //获取所有菜单
     async getMenuList(){
      const {data:res} = await this.$http.get('menus')
+      console.log(res)
       if(res.meta.status !== 200) return this.$message.error(res.meta.msg)
       this.menulist = res.data
     }
@@ -93,8 +103,14 @@ export default{
 }
 .el-aside{
   background-color: #333744;
+  .el-menu{
+    border-right: none;
+  }
 }
 .el-main{
   background-color: #eaedf1;
+}
+.iconfont{
+  margin-right: 10px;
 }
 </style>
