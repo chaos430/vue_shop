@@ -31,7 +31,7 @@ data(){
   return{
     //登陆表单的数据绑定对象
     loginForm:{
-      username:'admin',
+      username:'jun',
       password:'123456'
     },
     //表单验证规则对象
