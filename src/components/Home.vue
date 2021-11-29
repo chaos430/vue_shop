@@ -17,7 +17,7 @@
           <el-menu
               background-color="#333744"
               text-color="#fff"
-              active-text-color="#409eff" :unique-opened="true" :collapse="isCollapsed" :collapse-transition="false" :router="true">
+              active-text-color="#409eff" :unique-opened="true" :collapse="isCollapsed" :collapse-transition="false" :router="true" :default-active="activePath">
             <!--              一级菜单-->
             <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
               <!--                一级菜单模板-->
@@ -26,7 +26,7 @@
                 <span>{{item.authName}}</span>
               </template>
 <!--              二级菜单-->
-              <el-menu-item :index="'/' + subItem.path + ''" v-for="subItem in item.children" :key="subItem.id">
+              <el-menu-item :index="'/' + subItem.path + ''" v-for="subItem in item.children" :key="subItem.id" @click="saveNavState('/' + subItem.path)">
 <!--                二级菜单模板-->
                 <template slot="title">
                   <i class="el-icon-menu"></i>
@@ -63,13 +63,17 @@ export default{
         '145':'iconfont icon-baobiao'
       },
       //是否折叠
-      isCollapsed:false
+      isCollapsed:false,
+      activePath:''
     }
   },
   created() {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
+    this.activePath = activePath
   },
   methods:{
+
     logout(){
       window.sessionStorage.clear()
       this.$router.push('/login')
@@ -84,6 +88,9 @@ export default{
     //点按钮 切换菜单的折叠与展开
     toggleCollapse(){
       this.isCollapsed = !this.isCollapsed
+    },
+    saveNavState(activePath){
+      window.sessionStorage.setItem('activePath',activePath)
     }
   }
 }
