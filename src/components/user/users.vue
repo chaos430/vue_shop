@@ -37,7 +37,7 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog()"></el-button>
             <el-button type="warning" icon="el-icon-share" size="mini"></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
           </template>
@@ -82,7 +82,18 @@
     <el-button type="primary" @click="addUser">确 定</el-button>
   </span>
     </el-dialog>
-
+<!--修改用户的对话框-->
+    <el-dialog
+        title="修改用户"
+        :visible.sync="editDialogVisible"
+        width="50%"
+        >
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="editDialogVisible = false">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -153,6 +164,8 @@ export default {
         }, {validator: checkMobile, trigger: 'blur'}]
 
       },
+      //控制修改用户对话框的显示与隐藏
+      editDialogVisible: false
     }
   },
   created() {
@@ -184,6 +197,7 @@ export default {
     },
     //点击按钮，添加新用户
     addUser() {
+
       this.$refs.addFormRef.validate(async valid => {
         if (valid) {
           //可以发起添加用户的网络请求
@@ -196,6 +210,10 @@ export default {
           this.getUserList()
         }
       })
+    },
+    //展示编辑用户的对话框
+    showEditDialog(){
+      this.editDialogVisible = true
     },
 
     //监听 Switch开关状态的改变
