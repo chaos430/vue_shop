@@ -70,7 +70,6 @@ export default{
   created() {
     this.getMenuList()
     this.activePath = window.sessionStorage.getItem('activePath')
-    this.activePath = activePath
   },
   methods:{
 
@@ -91,6 +90,7 @@ export default{
     },
     saveNavState(activePath){
       window.sessionStorage.setItem('activePath',activePath)
+      this.activePath = activePath
     }
   }
 }
