@@ -77,7 +77,7 @@
 <!--      底部区域-->
       <span slot="footer" class="dialog-footer">
     <el-button @click="addDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+    <el-button type="primary" @click="addUser">确 定</el-button>
   </span>
     </el-dialog>
 
@@ -159,6 +159,13 @@ export default {
     //监听添加用户对话框的关闭事件
     addDialogClosed(){
       this.$refs.addFormRef.resetFields()
+    },
+    //点击按钮，添加新用户
+    addUser(){
+      this.$refs.addFormRef.validate(valid =>{
+        if(!valid)return
+        //可以发起添加用户的网络请求
+      })
     },
 
     //监听 Switch开关状态的改变
