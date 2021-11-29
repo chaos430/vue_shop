@@ -43,7 +43,7 @@
           </template>
         </el-table-column>
       </el-table>
-<!--      分页区域-->
+      <!--      分页区域-->
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -54,27 +54,29 @@
           :total="total">
       </el-pagination>
     </el-card>
-<!--    添加用户对话框-->
+    <!--    添加用户对话框-->
     <el-dialog
         title="添加用户"
         :visible.sync="addDialogVisible"
         width="50%"
         @close="addDialogClosed"
-        >
-<!--      内容主体区-->
+    >
+      <!--      内容主体区-->
       <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="addForm.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="addForm.password"></el-input>
-        </el-form-item><el-form-item label="邮箱" prop="email">
-        <el-input v-model="addForm.email"></el-input>
-      </el-form-item><el-form-item label="手机" prop="mobile">
-        <el-input v-model="addForm.mobile"></el-input>
-      </el-form-item>
-        </el-form>
-<!--      底部区域-->
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="addForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <!--      底部区域-->
       <span slot="footer" class="dialog-footer">
     <el-button @click="addDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="addUser">确 定</el-button>
@@ -88,17 +90,17 @@
 export default {
   data() {
     //验证邮箱的规则
-    let checkEmail = (rule,value,cb)=>{
+    let checkEmail = (rule, value, cb) => {
       const regEmail = /^\w+@\w+(\.\w+)+$/ // 验证邮箱的正则表达式
-      if(regEmail.test(value)){
+      if (regEmail.test(value)) {
         return cb()
       }
       cb(new Error('请输入合法邮箱'))
     }
     //验证手机号的规则
-    let checkMobile = (rule,value,cb)=>{
+    let checkMobile = (rule, value, cb) => {
       const regMobile = /^1[34578]\d{9}$/
-      if(regMobile.test(value)){
+      if (regMobile.test(value)) {
         return cb()
       }
       cb(new Error('请输入合法的手机号'))
@@ -113,22 +115,42 @@ export default {
       userList: [],
       total: 0,
       //控制添加用户对话框的显示与隐藏
-      addDialogVisible:false,
+      addDialogVisible: false,
       //添加用户的表单数据
-      addForm:{
-        username:'',
+      addForm: {
+        username: '',
         password: '',
-        email:'',
-        mobile:''
+        email: '',
+        mobile: ''
       },
       //添加表单的验证规则对象
-      addFormRules:{
-        username:[
-          {required: true,message:'请输入用户名',trigger: 'blur'},{min:3,max:10,message: '用户名的长度在3-10个字符之间',trigger: 'blur'}
+      addFormRules: {
+        username: [
+          {required: true, message: '请输入用户名', trigger: 'blur'}, {
+            min: 3,
+            max: 10,
+            message: '用户名的长度在3-10个字符之间',
+            trigger: 'blur'
+          }
         ],
-        password:[{required: true,message:'请输入密码',trigger: 'blur'},{min:6,max:15,message: '用户名的长度在6-15个字符之间',trigger: 'blur'}],
-        email:[{required: true,message:'请输入邮箱',trigger: 'blur'},{min:6,max:15,message: '用户名的长度在6-15个字符之间',trigger: 'blur'},{validator:checkEmail,trigger:'blur'}],
-        mobile:[{required: true,message:'请输入手机',trigger: 'blur'},{min:6,max:15,message: '用户名的长度在6-15个字符之间',trigger: 'blur'},{validator:checkMobile,trigger:'blur'}]
+        password: [{required: true, message: '请输入密码', trigger: 'blur'}, {
+          min: 6,
+          max: 15,
+          message: '用户名的长度在6-15个字符之间',
+          trigger: 'blur'
+        }],
+        email: [{required: true, message: '请输入邮箱', trigger: 'blur'}, {
+          min: 6,
+          max: 15,
+          message: '用户名的长度在6-15个字符之间',
+          trigger: 'blur'
+        }, {validator: checkEmail, trigger: 'blur'}],
+        mobile: [{required: true, message: '请输入手机', trigger: 'blur'}, {
+          min: 6,
+          max: 15,
+          message: '用户名的长度在6-15个字符之间',
+          trigger: 'blur'
+        }, {validator: checkMobile, trigger: 'blur'}]
 
       },
     }
@@ -147,35 +169,43 @@ export default {
       this.total = res.data.total
     },
     //监听pageSize改变的事件
-    handleSizeChange(newSize){
+    handleSizeChange(newSize) {
       this.queryInfo.pagesize = newSize
       this.getUserList()
     },
     //监听页码改变事件
-    handleCurrentChange(newPage){
+    handleCurrentChange(newPage) {
       this.queryInfo.pagenum = newPage
       this.getUserList()
     },
     //监听添加用户对话框的关闭事件
-    addDialogClosed(){
+    addDialogClosed() {
       this.$refs.addFormRef.resetFields()
     },
     //点击按钮，添加新用户
-    addUser(){
-      this.$refs.addFormRef.validate(valid =>{
-        if(!valid)return
-        //可以发起添加用户的网络请求
+    addUser() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (valid) {
+          //可以发起添加用户的网络请求
+          const {data: res} = await this.$http.post('users', this.addForm)
+          if(res.meta.status!== 201){
+            this.$message.error('添加用户失败')
+          }
+        this.$message.success('添加用户成功')
+          this.addDialogVisible = false
+          this.getUserList()
+        }
       })
     },
 
     //监听 Switch开关状态的改变
-   async userStateChange(userinfo){
-      const {data:res} = await this.$http.put(`users/${userinfo.id}/state/${userinfo.mg_state}`)
-     if(res.meta.status !== 200){
-       userinfo.mg_state = !userinfo.mg_state
-       return this.$message.error('更新用户状态失败')
-     }
-     this.$message.success('更新用户状态成功')
+    async userStateChange(userinfo) {
+      const {data: res} = await this.$http.put(`users/${userinfo.id}/state/${userinfo.mg_state}`)
+      if (res.meta.status !== 200) {
+        userinfo.mg_state = !userinfo.mg_state
+        return this.$message.error('更新用户状态失败')
+      }
+      this.$message.success('更新用户状态成功')
     }
   }
 }
