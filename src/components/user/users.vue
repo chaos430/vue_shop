@@ -86,7 +86,7 @@
     <el-dialog
         title="修改用户"
         :visible.sync="editDialogVisible"
-        width="50%"
+        width="50%" @close="editDialogClosed"
         >
       <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="70px">
         <el-form-item label="用户名">
@@ -234,6 +234,10 @@ export default {
           this.getUserList()
         }
       })
+    },
+    //监听修改用户对话框的关闭事件
+    editDialogClosed(){
+      this.$refs.editFormRef.resetFields()
     },
     //展示编辑用户的对话框
    async showEditDialog(id){
