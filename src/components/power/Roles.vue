@@ -17,7 +17,24 @@
       <!--角色列表区域-->
       <el-table :data="roleList" border stripe>
         <!--    展开列-->
-        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-row :class="['bdbottom',i1 === 0 ? 'bdtop' : '']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
+<!--              渲染一级权限-->
+              <el-col :span="5">
+                <el-tag>{{item1.authName}}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+<!--              渲染二级和三级权限-->
+              <el-col :span="19"></el-col>
+            </el-row>
+
+
+          </template>
+
+
+
+        </el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column label="角色名称" prop="roleName"></el-table-column>
         <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
@@ -33,7 +50,7 @@
       </el-table>
     </el-card>
     <!-- 添加角色对话框 -->
-    <el-dialog title="添加角色" :visible.sync="addDialogVisible" @close="addDislogClosed">
+    <el-dialog title="添加角色" :visible.sync="addDialogVisible" @close="addDialogClosed">
       <el-form :model="addRolesForm" :rules="addFormRules" ref="addRolesForm" label-width="100px">
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="addRolesForm.roleName"></el-input>
@@ -169,5 +186,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
+.el-tag{
+  margin:7px;
+}
+.bdtop{
+  border-top: 1px solid #eee;
+}
+.bdbottom{
+  border-bottom: 1px solid #eee;
+}
 </style>
