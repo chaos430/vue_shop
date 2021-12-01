@@ -107,24 +107,12 @@
 </template>
 
 <script>
+import {userAddFormRulesMixin} from "../../common/mixin";
+
 export default {
+  mixins:[userAddFormRulesMixin],
   data() {
-    //验证邮箱的规则
-    let checkEmail = (rule, value, cb) => {
-      const regEmail = /^\w+@\w+(\.\w+)+$/ // 验证邮箱的正则表达式
-      if (regEmail.test(value)) {
-        return cb()
-      }
-      cb(new Error('请输入合法邮箱'))
-    }
-    //验证手机号的规则
-    let checkMobile = (rule, value, cb) => {
-      const regMobile = /^1[34578]\d{9}$/
-      if (regMobile.test(value)) {
-        return cb()
-      }
-      cb(new Error('请输入合法的手机号'))
-    }
+
     return {
       //获取用列表的参数对象
       queryInfo: {
@@ -143,53 +131,13 @@ export default {
         email: '',
         mobile: ''
       },
-      //添加表单的验证规则对象
-      addFormRules: {
-        username: [
-          {required: true, message: '请输入用户名', trigger: 'blur'}, {
-            min: 3,
-            max: 10,
-            message: '用户名的长度在3-10个字符之间',
-            trigger: 'blur'
-          }
-        ],
-        password: [{required: true, message: '请输入密码', trigger: 'blur'}, {
-          min: 6,
-          max: 15,
-          message: '用户名的长度在6-15个字符之间',
-          trigger: 'blur'
-        }],
-        email: [{required: true, message: '请输入邮箱', trigger: 'blur'}, {
-          min: 6,
-          max: 15,
-          message: '用户名的长度在6-15个字符之间',
-          trigger: 'blur'
-        }, {validator: checkEmail, trigger: 'blur'}],
-        mobile: [{required: true, message: '请输入手机', trigger: 'blur'}, {
-          min: 6,
-          max: 15,
-          message: '用户名的长度在6-15个字符之间',
-          trigger: 'blur'
-        }, {validator: checkMobile, trigger: 'blur'}]
 
-      },
+
       //控制修改用户对话框的显示与隐藏
       editDialogVisible: false,
       //查询到的用户信息对象
-      editForm:{},
-      //修改表单验证规则对象
-      editFormRules:{
-        email:[
-          {required: true, message: '请输入用户邮箱', trigger: 'blur'},
-          {
-            validator:checkEmail,trigger:'blur'
-          },
+      editForm:{}
 
-        ],
-        mobile:[{required: true, message: '请输入用户手机', trigger: 'blur'},{
-          validator:checkMobile,trigger:'blur'
-        },]
-      }
     }
   },
   created() {

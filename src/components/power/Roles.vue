@@ -1,48 +1,171 @@
 <template>
-<div>
-  <!--  面包屑导航-->
-  <el-breadcrumb separator-class="el-icon-arrow-right">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-    <el-breadcrumb-item>权限管理</el-breadcrumb-item>
-    <el-breadcrumb-item>角色列表</el-breadcrumb-item>
-  </el-breadcrumb>
-<!--  卡片视图-->
-<el-card>
-<!--  添加角色按钮-->
-  <el-row>
-    <el-col>
-      <el-button type="primary">添加角色</el-button>
-    </el-col>
-  </el-row>
-<!--角色列表区域-->
-</el-card>
+  <div>
+    <!--  面包屑导航-->
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>权限管理</el-breadcrumb-item>
+      <el-breadcrumb-item>角色列表</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!--  卡片视图-->
+    <el-card>
+      <!--  添加角色按钮-->
+      <el-row>
+        <el-col>
+          <el-button type="primary" @click="addDialogVisible=true">添加角色</el-button>
+        </el-col>
+      </el-row>
+      <!--角色列表区域-->
+      <el-table :data="roleList" border stripe>
+        <!--    展开列-->
+        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="角色名称" prop="roleName"></el-table-column>
+        <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
+        <el-table-column label="操作">
+          <template v-slot="scope">
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)">编辑</el-button>
+            <el-button size="mini" type="danger" @click="rolesDelete(scope.row.id)" icon="el-icon-delete">删除</el-button>
+            <el-button size="mini" @click="showSetRightDialog(scope.row)" type="warning" icon="el-icon-search">分配权限</el-button>
+          </template>
+        </el-table-column>
 
-</div>
+
+      </el-table>
+    </el-card>
+    <!-- 添加角色对话框 -->
+    <el-dialog title="添加角色" :visible.sync="addDialogVisible" @close="addDislogClosed">
+      <el-form :model="addRolesForm" :rules="addFormRules" ref="addRolesForm" label-width="100px">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="addRolesForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="addRolesForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRolesUser">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 编辑对话框 -->
+    <el-dialog title="修改角色" :visible.sync="editDialogVisible" width="30%">
+      <el-form :model="editRolesForm" :rules="editFormRules" ref="editFormRef" label-width="100px">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="editRolesForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="editRolesForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editFormInfo">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
+import {rolesFormRulesMixin} from '/src/common/mixin'
+
 export default {
-data(){
-  return{
-    //所有角色列表数据
-    rolelist:[]
-  }
-},
-  created() {
-  this.getRolesList()
+
+  data() {
+    return {
+      //所有角色列表数据
+      roleList: [],
+      //添加角色对话框的显示与隐藏
+      addDialogVisible: false,
+      // 编辑对话框的显示和隐藏
+      editDialogVisible: false,
+      // 分配权限对话框的显示和隐藏
+      SetRightDialogVisible: false,
+      addRolesForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      editRolesForm:{
+
+      }
+    }
   },
-  methods:{
-   async getRolesList(){
-   const{data:res} = await this.$http.get('roles')
-     if(res.meta.status!== 200){
-       return this.$message.error('获取角色列表失败')
-     }
-     this.rolelist = res.data
+  mixins: [rolesFormRulesMixin],
+  created() {
+    this.getRolesList()
+  },
+  methods: {
+    async getRolesList() {
+      const {data: res} = await this.$http.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败')
+      }
+      this.roleList = res.data
+    },
+    addRolesUser() {
+      this.$refs.addRolesForm.validate(async valid => {
+        if (!valid) return
+        const {data: res} = await this.$http.post('roles', this.addRolesForm)
+        if (res.meta.status !== 201) {
+          return this.$message.error('添加角色失败!')
+        }
+        this.$message.success('添加角色成功!')
+        this.getRolesList()
+        this.addDialogVisible = false
+      })
+    },
+    // 清空添加角色对话框
+    addDialogClosed() {
+      this.$refs.addRolesForm.resetFields()
+    },
+    async rolesDelete(id){
+      const confirmResult = await this.$confirm('此操作将永久删除该角色, 是否继续?', '删除角色', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm'){
+        return this.$message.info('已取消该删除操作')
+      }
+      this.$http.delete('roles/' +id).then(res =>{
+        const {data:response} = res
+        if(response.meta.status !==200){
+          return this.$message.error('该用户删除失败')
+        }
+        this.$message.success('该用户已经删除')
+        this.getRolesList()
+      })
+    },
+    //修改用户信息
+    async showEditDialog(id){
+      const {data:res} = await this.$http.get('roles/' + id)
+      if(res.meta.status !== 200){
+        return this.$message.error('查询角色失败')
+      }
+      this.editRolesForm = res.data
+      this.editDialogVisible = true
+    },
+    editFormInfo(){
+      this.$refs.editFormRef.validate(valid =>{
+        if(valid){
+          this.$http.put('roles/' +this.editRolesForm.roleId,{
+            roleName:this.editRolesForm.roleName,
+            roleDesc:this.editRolesForm.roleDesc
+          }).then(res=>{
+            if(res.data.meta.status !== 200){
+              return this.$message.error('修改角色失败')
+            }
+            this.$message.success('修改角色成功')
+            this.getRolesList()
+          })
+          this.editDialogVisible = false
+        }
+      })
+
+
     }
   }
 
-
-}
+  }
 </script>
 
 <style lang="less" scoped>
