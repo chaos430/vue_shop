@@ -94,7 +94,7 @@
     <el-dialog
         title="分配权限"
         :visible.sync="setRightDialogVisible"
-        width="50%">
+        width="50%" @close="setRightDialogClosed">
 <!--      树形控件-->
       <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys"></el-tree>
       <span slot="footer" class="dialog-footer">
@@ -164,6 +164,10 @@ export default {
     // 清空添加角色对话框
     addDialogClosed() {
       this.$refs.addRolesForm.resetFields()
+    },
+    //监听分配权限对话框的关闭事件
+    setRightDialogClosed(){
+      this.defKeys = []
     },
     //展示分配权限对话框
    async showSetRightDialog(role){
