@@ -53,7 +53,7 @@
           <template v-slot="scope">
             <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)">编辑</el-button>
             <el-button size="mini" type="danger" @click="rolesDelete(scope.row.id)" icon="el-icon-delete">删除</el-button>
-            <el-button size="mini" @click="showSetRightDialog(scope.row)" type="warning" icon="el-icon-search">分配权限</el-button>
+            <el-button size="mini" @click="showSetRightDialog" type="warning" icon="el-icon-search">分配权限</el-button>
           </template>
         </el-table-column>
 
@@ -90,6 +90,17 @@
         <el-button type="primary" @click="editFormInfo">确 定</el-button>
       </span>
     </el-dialog>
+<!--    分配权限的对话框-->
+    <el-dialog
+        title="分配权限"
+        :visible.sync="setRightDialogVisible"
+        width="50%">
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="setRightDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -102,12 +113,14 @@ export default {
     return {
       //所有角色列表数据
       roleList: [],
+      //所有权限的数据
+      rightsList:[],
       //添加角色对话框的显示与隐藏
       addDialogVisible: false,
       // 编辑对话框的显示和隐藏
       editDialogVisible: false,
       // 分配权限对话框的显示和隐藏
-      SetRightDialogVisible: false,
+      setRightDialogVisible: false,
       addRolesForm: {
         roleName: '',
         roleDesc: ''
@@ -145,6 +158,19 @@ export default {
     addDialogClosed() {
       this.$refs.addRolesForm.resetFields()
     },
+    //展示分配权限对话框
+   async showSetRightDialog(){
+      //获取所有权限的数据
+      this.setRightDialogVisible =true
+    const {data:res} = await this.$http.get('rights/tree')
+if(res.meta.status !== 200){
+  return this.$message.error('获取权限数据失败')
+
+}
+//获取到的权限数据保存到data中
+this.rightsList = res.data
+     console.log(this.rightsList);
+   },
     //根据id删除对应的权限
    async removeRightById(role,rightId){
       //弹框提示用户是否要删除
