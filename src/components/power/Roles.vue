@@ -96,7 +96,7 @@
         :visible.sync="setRightDialogVisible"
         width="50%">
 <!--      树形控件-->
-      <el-tree :data="rightsList" :props="treeProps"></el-tree>
+      <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all></el-tree>
       <span slot="footer" class="dialog-footer">
     <el-button @click="setRightDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
