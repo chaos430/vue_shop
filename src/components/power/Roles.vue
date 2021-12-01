@@ -95,7 +95,8 @@
         title="分配权限"
         :visible.sync="setRightDialogVisible"
         width="50%">
-      <span>这是一段信息</span>
+<!--      树形控件-->
+      <el-tree :data="rightsList" :props="treeProps"></el-tree>
       <span slot="footer" class="dialog-footer">
     <el-button @click="setRightDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
@@ -115,7 +116,11 @@ export default {
       roleList: [],
       //所有权限的数据
       rightsList:[],
-      //添加角色对话框的显示与隐藏
+      //树型控件的属性绑定对象
+      treeProps:{
+        label:'authName',
+        children:'children'
+      },
       addDialogVisible: false,
       // 编辑对话框的显示和隐藏
       editDialogVisible: false,
