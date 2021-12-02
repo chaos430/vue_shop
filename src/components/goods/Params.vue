@@ -32,11 +32,23 @@
 <script>
 export default {
   data() {
-    return {}
+    return {
+      cateList:[]
+    }
   },
   created() {
+
+    this.getCateList()
   },
-  methods: {}
+  methods: {
+   async getCateList(){
+    const {data:res} = await this.$http.get('categories')
+     if(res.meta.status!== 200){
+       return this.$message.error('获取商品分类失败')
+     }
+     this.cateList =res.data
+    }
+  }
 }
 </script>
 
