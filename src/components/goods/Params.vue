@@ -21,7 +21,11 @@
               选择商品分类：
             </span>
 <!--            选择商品分类的级联选择框-->
-
+            <el-cascader
+                v-model="selectedCateKeys"
+                :options="cateList"
+                :props="cateProps"
+                @change="handleChange"></el-cascader>
           </el-col>
         </el-row>
 
@@ -33,7 +37,15 @@
 export default {
   data() {
     return {
-      cateList:[]
+      cateList:[],
+      cateProps:{
+        expandTrigger:'hover',
+        value:'cat_id',
+        label:'cat_name',
+        children:'children'
+      },
+      //级联选择框双相绑定到的数组
+      selectedCateKeys:[]
     }
   },
   created() {
@@ -42,11 +54,17 @@ export default {
   },
   methods: {
    async getCateList(){
+
     const {data:res} = await this.$http.get('categories')
      if(res.meta.status!== 200){
        return this.$message.error('获取商品分类失败')
      }
      this.cateList =res.data
+    },
+    //级联选择框选中项变化触发
+    handleChange(){
+
+
     }
   }
 }
