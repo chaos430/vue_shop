@@ -17,20 +17,21 @@
     <tree-table :data="cateList" :columns="columns" :selection-type="false" :expand-type="false" show-index border class="treeTable">
 <!--      是否有效-->
 <template slot="isok" slot-scope="scope">
-  <i class="el-icon-success" v-if="scope.row.cat_delete === false" style="color: lightgreen"></i>
+
+  <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color: lightgreen"></i>
   <i class="el-icon-error" style="color: red" v-else></i>
 </template>
 <!--     排序 -->
 <template slot="order" slot-scope="scope">
-  <el-tag size="mini" v-if="scope.row ===0">一级</el-tag>
-  <el-tag type="success" size="mini" v-else-if="scope.row ===1">二级</el-tag>
+  <el-tag size="mini" v-if="scope.row.cat_level === 0">一级</el-tag>
+  <el-tag type="success" size="mini" v-else-if="scope.row.cat_level ===1">二级</el-tag>
   <el-tag type="warning" size="mini" v-else>三级</el-tag>
 
 
 </template>
 <!--      操作-->
       <template slot="opt" slot-scope="scope">
-        <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+        <el-button type="primary" icon="el-icon-edit" size="mini" @click="showGoodsEditDialog">编辑</el-button>
         <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
       </template>
     </tree-table>
@@ -49,7 +50,7 @@
   <el-dialog
       title="添加分类"
       :visible.sync="addCateDialogVisible"
-      width="50%"
+      width="50%" @close="addCateDialogClosed"
       >
 <!--    添加分类的表单-->
     <el-form :model="addCateForm" :rules="addFormRules" ref="addCateFormRef" label-width="100px">
@@ -57,14 +58,19 @@
         <el-input v-model="addCateForm.cat_name"></el-input>
       </el-form-item>
       <el-form-item label="父级分类：">
-
+        <el-cascader
+            v-model="selectedKeys"
+            :options="parentCateList"
+            :props="cascaderProps"
+            @change="parentCateChanged" clearable></el-cascader>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
     <el-button @click="addCateDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addCateDialogVisible = false">确 定</el-button>
+    <el-button type="primary" @click="addCate">确 定</el-button>
   </span>
   </el-dialog>
+
 </div>
 </template>
 
@@ -98,8 +104,18 @@ export default {
         cat_level:0
 
       },
+
       //父级分类的列表
 parentCateList:[],
+      //指定级联选择器的配置对象
+      cascaderProps:{
+        value:'cat_id',
+        label:'cat_name',
+        children:'children',
+        expandTrigger:'hover'
+      },
+      //选中的父级分类的id数组
+      selectedKeys:[],
       //为table指定列的定义
       columns:[{
         label:'分类名称',
@@ -152,12 +168,48 @@ parentCateList:[],
       this.getParentCateList()
       this.addCateDialogVisible = true
     },
+    //选择项发生变化触发这个函数
+    parentCateChanged(){
+      if(this.selectedKeys.length>0){
+        //父级分类的id
+      this.addCateForm.cat_pid = this.selectedKeys[this.selectedKeys.length -1]
+        this.addCateForm.cat_level = this.selectedKeys.length
+
+      }else {
+        this.addCateForm.cat_pid = 0
+        this.addCateForm.cat_level = 0
+      }
+    },
+    //点击按钮 添加新的分类
+    addCate(){
+      this.$refs.addCateFormRef.validate(async valid=>{
+        if(valid){
+          const{data:res} = await this.$http.post('categories',this.addCateForm)
+          if(res.meta.status!== 201){
+            return this.$message.error('添加分类失败')
+          }
+        this.$message.success('添加分类成功')
+          this.getCateList()
+          this.addCateDialogVisible =false
+        }
+      })
+
+    },
+    //监听对话框的关闭 重置表单数据
+    addCateDialogClosed(){
+      this.$refs.addCateFormRef.resetFields()
+      this.selectedKeys = []
+      this.addCateForm.cat_level = 0
+      this.addCateForm.cat_pid = 0
+
+    },
     //获取父级分类的数据列表
   async  getParentCateList(){
     const {data:res} =await this.$http.get('categories',{params:{type:2}})
     if(res.meta.status!== 200){
       return this.$message.error('获取父级分类数据失败')
     }
+
     this.parentCateList =res.data
 },
 
@@ -168,6 +220,10 @@ parentCateList:[],
       }
       this.cateList =res.data.result
      this.total =res.data.total
+    },
+    showGoodsEditDialog(){
+      this.editDialogVisible =true
+
     }
   }
 }
@@ -176,5 +232,8 @@ parentCateList:[],
 <style lang="less" scoped>
 .treeTable{
   margin-top: 15px;
+}
+.el-cascader{
+  width: 100%;
 }
 </style>
