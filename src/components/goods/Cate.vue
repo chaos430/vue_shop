@@ -15,7 +15,10 @@
     </el-row>
 <!--    表格-->
     <tree-table :data="cateList" :columns="columns" :selection-type="false" :expand-type="false" show-index border>
-
+<template slot="isok" slot-scope="scope">
+  <i class="el-icon-success" v-if="scope.row.cat_delete === false" style="color: lightgreen"></i>
+  <i class="el-icon-error" style="color: red" v-else></i>
+</template>
 
     </tree-table>
 <!--    分页-->
@@ -33,8 +36,6 @@ export default {
         type:3,
         pagenum:1,
         pagesize:5
-
-
       },
 //商品分类的数据列表 默认为空
       cateList:[],
@@ -45,7 +46,15 @@ export default {
         label:'分类名称',
         prop:'cat_name'
 
-      }]
+      },{
+        label:'是否有效',
+        //表示将当前列定义为模板列
+        type:'template',
+        //b表示当前这一列使用的模板名称
+        template:'isok'
+
+      }
+      ]
     }
   },
   created() {
