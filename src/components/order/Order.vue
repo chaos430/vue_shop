@@ -37,26 +37,48 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" icon="el-icon-edit"></el-button>
-            <el-button size="mini" type="success" icon="el-icon-location"></el-button>
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showBox"></el-button>
+            <el-button size="mini" type="success" icon="el-icon-location" @click="showProgressBox"></el-button>
           </template>
         </el-table-column>
       </el-table>
+      <!--    分页区-->
+      <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="queryInfo.pagenum"
+          :page-sizes="[5, 10, 15]"
+          :page-size="queryInfo.pagesize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+      </el-pagination>
     </el-card>
-<!--    分页区-->
-    <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[5, 10, 15]"
-        :page-size="queryInfo.pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total">
-    </el-pagination>
+<!--    修改地址的对话框-->
+    <el-dialog
+        title="修改地址"
+        :visible.sync="addressVisible"
+        width="50%" @close="addressDialogClosed">
+      <el-form :model="addressForm" :rules="addressFormRules" ref="addressFormRef" label-width="100px">
+        <el-form-item label="省市区/县" prop="address1">
+            <el-cascader :options="cityData" v-model="addressForm.address1"></el-cascader>
+        </el-form-item>
+        <el-form-item label="详细地址" prop="address2">
+          <el-input v-model="addressForm.address2"></el-input>
+        </el-form-item>
+      </el-form>
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="addressVisible = false">取 消</el-button>
+    <el-button type="primary" @click="addressVisible = false">确 定</el-button>
+  </span>
+    </el-dialog>
+
+
   </div>
 </template>
 
 <script>
+import cityData from "./citydata";
 export default {
   data() {
     return {
@@ -66,7 +88,22 @@ export default {
         pagesize:10
       },
       total:0,
-      orderList:[]
+      orderList:[],
+      addressVisible:false,
+      addressForm:{
+        address1:[],
+        address2:''
+      },
+      addressFormRules:{
+        address1: [{
+          required:true,message:'请选择省市区县',trigger:'blur'
+        }],
+        address2:[{
+          required:true,message:'请填写详细地址',trigger:'blur'
+        }]
+      },
+      cityData
+
     }
   },
   created() {
@@ -90,6 +127,16 @@ export default {
     handleCurrentChange(newPage){
      this.queryInfo.pagenum = newPage
       this.getOrderList()
+    },
+    //展示修改地址对话框
+    showBox(){
+     this.addressVisible =true
+    },
+    addressDialogClosed(){
+     this.$refs.addressFormRef.resetFields()
+    },
+    showProgressBox(){
+
     }
   }
 }
