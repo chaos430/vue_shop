@@ -141,7 +141,11 @@ export const goodsAddFormRulesMixin = {
                 goods_weight: [{ required: true, message: '请输入商品的重量', trigger: 'blur' }],
                 goods_number: [{ required: true, message: '请输入商品的数量', trigger: 'blur' }],
                 goods_cat: [{ required: true, message: '请选择商品分类', trigger: 'blur' }]
+            },
+            editFormRules:{
+                goods_name: {
+                    required: true, message: '请输入商品的名称', trigger: 'blur' }
+                }
             }
         }
-    }
 }

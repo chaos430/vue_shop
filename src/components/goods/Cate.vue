@@ -31,8 +31,8 @@
 </template>
 <!--      操作-->
       <template slot="opt" slot-scope="scope">
-        <el-button type="primary" icon="el-icon-edit" size="mini" @click="showGoodsEditDialog">编辑</el-button>
-        <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+        <el-button type="primary" icon="el-icon-edit" size="mini" @click="showGoodsEditDialog(scope.row)">编辑</el-button>
+        <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeCate(scope.row.cat_id)">删除</el-button>
       </template>
     </tree-table>
 <!--    分页-->
@@ -68,6 +68,23 @@
     <span slot="footer" class="dialog-footer">
     <el-button @click="addCateDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="addCate">确 定</el-button>
+  </span>
+  </el-dialog>
+<!--  修改分类的对话框-->
+  <el-dialog
+      title="修改分类"
+      :visible.sync="editCateDialogVisible"
+      width="50%"
+  >
+    <!--    修改分类的表单-->
+    <el-form :model="editCate" :rules="editCateRules" ref="editCateRef" label-width="100px">
+      <el-form-item label="分类名称：" prop="cat_name">
+        <el-input v-model="editCate.cat_name"></el-input>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="editCateInfo">确 定</el-button>
   </span>
   </el-dialog>
 
@@ -117,37 +134,44 @@ parentCateList:[],
       //选中的父级分类的id数组
       selectedKeys:[],
       //为table指定列的定义
-      columns:[{
+      columns:[
+          {
         label:'分类名称',
         prop:'cat_name'
-
-      },{
+          },
+          {
         label:'是否有效',
         //表示将当前列定义为模板列
         type:'template',
         //b表示当前这一列使用的模板名称
         template:'isok'
 
-      },
-        {
+          },
+          {
           label:'排序',
           //表示将当前列定义为模板列
           type:'template',
           //b表示当前这一列使用的模板名称
           template:'order'
 
-        },
-        {
+          },
+          {
           label:'操作',
           //表示将当前列定义为模板列
           type:'template',
           //b表示当前这一列使用的模板名称
           template:'opt'
-
-        }
-      ]
+          }
+      ],
+      editCateDialogVisible:false,
+      editCate:{},
+      editCateRules: {
+        cat_name: [{ required: true, message: '请输入要修改的信息', trigger: 'blur' }]
+      },
+      editCateId: ''
     }
   },
+
   created() {
     this.getCateList()
   },
@@ -221,9 +245,40 @@ parentCateList:[],
       this.cateList =res.data.result
      this.total =res.data.total
     },
-    showGoodsEditDialog(){
-      this.editDialogVisible =true
+  async showGoodsEditDialog(cateInfo){
 
+      this.editCateId = cateInfo.cat_id
+      const { data: res } = await this.$http.get('categories/' + cateInfo.cat_id)
+    this.editCate = res.data
+      this.editCateDialogVisible =true
+    },
+    async editCateInfo(){
+      const {data:res} = await this.$http.put('categories/' + this.editCate.cat_id,{cat_name:this.editCate.cat_name})
+      if(res.meta.status !==200){
+        return this.$message.error('更新分类数据失败')
+      }
+      this.$message.success('更新分类数据成功')
+      this.getCateList()
+      this.editCateDialogVisible =false
+    },
+
+   async removeCate(id){
+      const confirRustle = await this.$confirm('此操作将永久删除该文件, 是否继续?', '删除分类', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+
+      if (confirRustle !== 'confirm') {
+        return this.$message.info('已取消删除操作!')
+      }
+
+      const { data: res } = await this.$http.delete('categories/' + id)
+      if (res.meta.status !== 200) {
+        return this.$message.error('分类删除失败!')
+      }
+      this.$message.success('该分类已经成功删除!')
+      this.getCateList()
     }
   }
 }
