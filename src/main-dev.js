@@ -11,8 +11,6 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css' // import styles
 import 'quill/dist/quill.snow.css' // for snow theme
 import 'quill/dist/quill.bubble.css' // for bubble theme
-import Nprogress from 'nprogress'
-import 'mprogress/nprogress.css'
 Vue.config.productionTip = false
 import axios from 'axios'
 Vue.prototype.$http = axios
@@ -21,15 +19,11 @@ Vue.prototype.$http = axios
 axios.defaults.baseURL = 'https://liulongbin.top:8888/api/private/v1/'
 //在request拦截器中,展示进度条
 axios.interceptors.request.use(config =>{
-    Nprogress.start()
+
   config.headers.Authorization = window.sessionStorage.getItem('token')
   return config
 })
-//在response拦截器中隐藏进度条
-axios.interceptors.response.use(config=>{
-    Nprogress.done()
-    return config
-})
+
 Vue.component('tree-table',TreeTable)
 Vue.use(VueQuillEditor)
 Vue.filter('dateFormat',function(originVal){

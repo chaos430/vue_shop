@@ -198,7 +198,6 @@ if(this.addForm.goods_cat.length!== 3){
        if(!valid){
          return this.$message.error('请填写必要的表单项')
        }
-       console.log(222)
        //执行添加的业务逻辑
        //lodash cloneDeep(obj)
       const form = _.cloneDeep(this.addForm)
@@ -212,7 +211,6 @@ if(this.addForm.goods_cat.length!== 3){
          this.addForm.attrs.push(newInfo)
        })
        form.attrs = this.addForm.attrs
-       console.log(form)
 
        //发起请求添加商品
        //商品的名称必须唯一

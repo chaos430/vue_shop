@@ -9,8 +9,6 @@
 <!--    elcard-->
     <el-card>
       <div id="main" style="width: 650px;height:300px;"></div>
-
-
     </el-card>
   </div>
 </template>
